@@ -1,9 +1,10 @@
 "use client";
-import React, { use, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Image from "next/image";
-import { LayoutGrid, Search, ShoppingBag } from "lucide-react";
+import { CircleUserIcon, LayoutGrid, Search, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Api from "../-utils/Api";
+import CartItemList from "./CartItemList";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,17 +14,53 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { CartContext } from "../_context/CartContext";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 const Header = () => {
+  const router = useRouter();
   const [Category, setCategory] = useState([]);
+  const [totalCartItem, setTotalCartItem] = useState(0);
+  const [isLogin, setIsLogin] = useState(false);
+  const userid =
+    typeof window !== "undefined"
+      ? JSON.parse(sessionStorage.getItem("user"))
+      : null;
+  const jwt =
+    typeof window !== "undefined" ? sessionStorage.getItem("jwt") : null;
+  const { updateCart, setUpdateCart } = useContext(CartContext);
+  const [cartItemList, setCartItemList] = useState([]);
+  const onSignOut = () => {
+    sessionStorage.clear();
+    router.push("/sign-in");
+  };
 
   useEffect(() => {
-    getCategorylist();
-  }, []);
+    setIsLogin(!!sessionStorage.getItem("jwt"));
+    getCartItems();
+  }, [updateCart]);
 
   const getCategorylist = () => {
     Api.getCategory().then((resp) => {
       setCategory(resp.data.data);
+      console.log(resp.data.data);
     });
+  };
+  const getCartItems = async () => {
+    const cartItems = await Api.getCartItems(userid.id, jwt);
+    console.log(cartItems);
+    setTotalCartItem(cartItems.length);
+    setCartItemList(cartItems);
   };
   return (
     <div className="shadow-md flex justify-between p-2">
@@ -43,11 +80,18 @@ const Header = () => {
           <DropdownMenuContent>
             <DropdownMenuLabel>Browse Category</DropdownMenuLabel>
             {Category.map((cat) => (
-              <DropdownMenuItem key={cat.id}>{cat.name}</DropdownMenuItem>
-
+              <DropdownMenuItem key={cat.id}>
+                <Image
+                  src={`http://localhost:1337${cat?.icon?.[0]?.url}`}
+                  loading="eager"
+                  width={23}
+                  height={23}
+                  unoptimized={true}
+                  alt=""
+                />
+                <p className="cursor-pointer text-lg">{cat.name}</p>
+              </DropdownMenuItem>
             ))}
-
-
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -58,10 +102,52 @@ const Header = () => {
       </div>
 
       <div className="flex gap-5 items-center">
-        <h2 className="flex gap-2 items-center">
-          <ShoppingBag />0
-        </h2>
-        <Button>Login</Button>
+        <Sheet>
+          <SheetTrigger>
+            {" "}
+            <h2 className="flex gap-2 items-center">
+              <ShoppingBag />
+              <span>{totalCartItem}</span>
+            </h2>
+          </SheetTrigger>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle className="bg-[#ffcc00] font-bold text-black p-2 mt-5">
+                My Cart
+              </SheetTitle>
+              <SheetDescription>
+                <CartItemList cartItemList={cartItemList} />
+              </SheetDescription>
+            </SheetHeader>
+          </SheetContent>
+        </Sheet>
+
+        {!isLogin ? (
+          <Link href={"/sign-in"}>
+            <Button>Login</Button>
+          </Link>
+        ) : (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <CircleUserIcon className="h-7 w-7 cursor-pointer" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuItem>Profile</DropdownMenuItem>
+                <DropdownMenuItem>Orders</DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem onClick={() => onSignOut()}>
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
     </div>
   );
