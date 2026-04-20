@@ -1,6 +1,17 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import { TrashIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 function CartItemList({ cartItemList }) {
+  const [subTotal, setSubTotal] = useState(0);
+  useEffect(() => {
+    let total = 0;
+    cartItemList.forEach((item) => {
+      total = total + item.amount;
+    });
+    setSubTotal(total);
+  }, [cartItemList]);
   return (
     <div>
       <div>
@@ -21,8 +32,20 @@ function CartItemList({ cartItemList }) {
                 <h2 className="font-bold "> {cart?.amount} $</h2>
               </div>
             </div>
+            <TrashIcon />
           </div>
         ))}
+      </div>
+
+      <div className="mt-8 absolute w-[90%] bottom-5 flex flex-col">
+        <h2 className="flex justify-between font-bold">
+          SubTotal <span>${subTotal.toFixed(2)}</span>
+        </h2>
+        <Link href="/checkout">
+          <Button className="mt-5 w-[99%] text-black font-bold text-xl">
+            Checkout
+          </Button>
+        </Link>
       </div>
     </div>
   );

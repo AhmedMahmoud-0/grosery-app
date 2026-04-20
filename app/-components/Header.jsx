@@ -48,6 +48,7 @@ const Header = () => {
   useEffect(() => {
     setIsLogin(!!sessionStorage.getItem("jwt"));
     getCartItems();
+    getCategorylist();
   }, [updateCart]);
 
   const getCategorylist = () => {
@@ -62,6 +63,7 @@ const Header = () => {
     setTotalCartItem(cartItems.length);
     setCartItemList(cartItems);
   };
+  console.log("Check Categories Content", Category);
   return (
     <div className="shadow-md flex justify-between p-2">
       <div className="flex items-center gap-8">
@@ -83,13 +85,14 @@ const Header = () => {
               <DropdownMenuItem key={cat.id}>
                 <Image
                   src={`http://localhost:1337${cat?.icon?.[0]?.url}`}
-                  loading="eager"
                   width={23}
                   height={23}
                   unoptimized={true}
                   alt=""
                 />
-                <p className="cursor-pointer text-lg">{cat.name}</p>
+                <Link href={`/products-category/${cat.name}`}>
+                  <p className="cursor-pointer text-lg">{cat.name}</p>
+                </Link>
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
@@ -112,7 +115,7 @@ const Header = () => {
           </SheetTrigger>
           <SheetContent>
             <SheetHeader>
-              <SheetTitle className="bg-[#ffcc00] font-bold text-black p-2 mt-5">
+              <SheetTitle className="bg-[#ffcc00] font-bold text-black p-2 mt-5 ">
                 My Cart
               </SheetTitle>
               <SheetDescription>
@@ -137,7 +140,9 @@ const Header = () => {
               <DropdownMenuGroup>
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Orders</DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href="/myOrders">Orders</Link>
+                </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>

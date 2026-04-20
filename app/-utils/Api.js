@@ -64,9 +64,35 @@ const getCartItems = (userid, jwt) =>
           image: product.image?.[0]?.formats?.large?.url,
           sellingPrice: product?.sellingPrice,
           id: item.id,
+          product: product?.id,
         };
       });
       return cartItemList;
+    });
+
+const createOrder = (data, jwt) =>
+  axiosGlobal.post("/orders", data, {
+    headers: {
+      Authorization: "Bearer " + jwt,
+    },
+  });
+
+const myOrders = (userid, jwt) =>
+  axiosGlobal
+    .get(
+      "/orders?[userId][$eq]=" +
+        userid +
+        "&[populate][orderItemList][populate][product][populate]=image",
+    )
+    .then((resp) => {
+      const response = resp.data.data;
+      const orderList = response.map((item, index) => ({
+        id: item.id,
+        totalOrderAmount: item.totalOrderAmount,
+        orderItemList: item.orderItemList,
+        createdAt: item.createdAt,
+      }));
+      return orderList;
     });
 
 export default {
@@ -79,4 +105,6 @@ export default {
   signIn,
   AddToCart,
   getCartItems,
+  createOrder,
+  myOrders,
 };
