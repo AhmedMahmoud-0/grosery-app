@@ -5,6 +5,8 @@ import Api from "./-utils/Api";
 import CategoryList from "./-components/CategoryList";
 import ProductList from "./-components/ProductList";
 import Footer from "./-components/Footer";
+
+export const dynamic = "force-dynamic";
 export default async function Home() {
   const sliderList = await Api.getSlider();
   console.log(sliderList);
@@ -27,13 +29,13 @@ export default async function Home() {
           </p>
         </div>
         <div className="w-1/2 flex justify-end">
-          <Image 
-          src="/footerImg.png.png" 
-          width={400} 
-          height={250} 
-          alt="Delivery" 
-          className="mt-8 object-contain"
-          layout="responsive"
+          <Image
+            src="/footerImg.png.png"
+            width={400}
+            height={250}
+            alt="Delivery"
+            className="mt-8 object-contain"
+            layout="responsive"
           />
         </div>
       </div>
