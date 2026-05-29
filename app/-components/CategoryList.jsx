@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,7 +12,8 @@ function CategoryList({ categoryList }) {
       justify-items-center items-center mt-5"
       >
         {categoryList?.map((category, index) => (
-          <Link href={"/products-category/"+category.name}
+          <Link
+            href={"/products-category/" + category.name}
             className="w-30 h-35 mt-3 bg-amber-100 p-3 flex flex-col items-center text-center group"
             key={index}
           >

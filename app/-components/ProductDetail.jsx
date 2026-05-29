@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import Image from "next/image";
 import { ShoppingBasket } from "lucide-react";
 import { Button } from "@/components/ui/button";
